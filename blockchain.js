@@ -2,13 +2,21 @@ const { ethers } = require("ethers");
 const providerUrl = "https://zeta-chain-testnet.drpc.org";
 
 async function getBalance(key) {
-    const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-
-    const wallet = new ethers.Wallet(key, provider);
-    const address = await wallet.getAddress()
-    const balance = await wallet.getBalance();
-    console.log(address);
-    console.log(ethers.utils.formatEther(balance))
+    try {
+        const provider = new ethers.providers.JsonRpcProvider(providerUrl);
+    
+        const wallet = new ethers.Wallet(key, provider);
+        const address = await wallet.getAddress()
+        const balance = await wallet.getBalance();
+        return {
+            balance:ethers.utils.formatEther(balance),
+            address:address
+        }
+    }
+    catch(err){
+        console.log(err);
+        return false;
+    }
 }
 
 async function sendTransaction(privateKey, toAddress, amountInEther) {
@@ -26,12 +34,18 @@ async function sendTransaction(privateKey, toAddress, amountInEther) {
         const transactionResponse = await wallet.sendTransaction(tx);
         console.log("Transaction Hash:", transactionResponse.hash);
 
-        await transactionResponse.wait();
-        console.log("Transaction confirmed!");
+        const result = await transactionResponse.wait();
+        console.log("Transaction confirmed! " + result);
+        return {
+            operation:true,
+            transactionHash:transactionResponse.hash
+        }
     } catch (error) {
         console.error("Error sending transaction:", error);
+        return {
+            operation:false
+        }
     }
 }
 
-//sendTransaction("PRIVATE_KEY","RECEIVER_ADDRESS","AMOUNT")
-//getBalance("PRIVATE_KEY");
+module.exports = { getBalance,sendTransaction }
