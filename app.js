@@ -1,4 +1,4 @@
-const { getBalance,sendTransaction } = require("./blockchain");
+const { getWallet, sendTransaction } = require("./blockchain");
 const express = require("express");
 const cors = require("cors");
 const path = require("node:path")
@@ -13,17 +13,17 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-app.get('/api/balance',async (req,res)=>{
+app.get('/api/wallet',async (req,res)=>{
     const key = req.query["key"];
     if(key === "" || key === undefined)
         return res.status(400).json({message:"query string 'key' is missing"});
 
-    const balance = await getBalance(key);
+    const data = await getWallet(key);
 
-    if (!balance)
+    if (!data)
         return res.status(400).json({message:"key invalide or something went wrong"});
 
-    res.status(200).json(balance);
+    res.status(200).json(data);
 });
 
 app.post('/api/send',async (req,res)=>{

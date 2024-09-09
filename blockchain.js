@@ -1,16 +1,19 @@
 const { ethers } = require("ethers");
+const { AptosClient, AptosAccount, FaucetClient, HexString, TokenClient } =  require("aptos")
 const providerUrl = "https://zeta-chain-testnet.drpc.org";
+const NODE_URL = "https://fullnode.testnet.aptoslabs.com"
+const FAUCET_URL = "https://faucet.testnet.aptoslabs.com"
 
-async function getBalance(key) {
+async function getWallet(key) {
     try {
-        const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-    
-        const wallet = new ethers.Wallet(key, provider);
-        const address = await wallet.getAddress()
-        const balance = await wallet.getBalance();
+        const privateKey = HexString.ensure(key).toUint8Array();
+        const faucet = new FaucetClient(NODE_URL, FAUCET_URL)
+        const wallet = new AptosAccount(privateKey)
+        
+        await faucet.fundAccount(wallet.address(), 9000_000_000_000)
+
         return {
-            balance:ethers.utils.formatEther(balance),
-            address:address
+            address: wallet.address().toString()
         }
     }
     catch(err){
@@ -19,26 +22,41 @@ async function getBalance(key) {
     }
 }
 
-async function sendTransaction(privateKey, toAddress, amountInEther) {
-    const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-    const wallet = new ethers.Wallet(privateKey, provider);
-
-    const tx = {
-        to: toAddress,
-        value: ethers.utils.parseEther(amountInEther),
-    };
-
-    console.log(`Sending ${amountInEther} ETH to ${toAddress}`);
+async function sendTransaction(privateKey, module, amount) {
 
     try {
-        const transactionResponse = await wallet.sendTransaction(tx);
-        console.log("Transaction Hash:", transactionResponse.hash);
+        const privateKey = HexString.ensure(key).toUint8Array();
+        const wallet = new AptosAccount(privateKey)
 
-        const result = await transactionResponse.wait();
-        console.log("Transaction confirmed! " + result);
+        const now = new Date()
+        const end = addMonths(now, 12);
+        
+        const create_candy_machine = {
+        function: `${module}::launchpad::create_collection`,
+        type_arguments: [],
+        arguments: [
+            "NFT APPLE BROH",
+            "just a NFT broh",
+            "https://gateway.irys.xyz/FUNjcSnXDZXRNpzfsouds2Pdrshvvq-62VOnkbtqAE4/collection.json",
+            1000,
+            1,
+            amount,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            dateToSeconds(now),
+            dateToSeconds(end),
+            2,
+            amount,
+        ]
+        }
+    
+        const tx = await SubmitTransaction(wallet, create_candy_machine)
         return {
-            operation:true,
-            transactionHash:transactionResponse.hash
+            operation: true,
+            transactionHash: `https://explorer.aptoslabs.com/txn/${tx}?network=testnet`
         }
     } catch (error) {
         console.error("Error sending transaction:", error);
@@ -48,4 +66,17 @@ async function sendTransaction(privateKey, toAddress, amountInEther) {
     }
 }
 
-module.exports = { getBalance,sendTransaction }
+
+  async function SubmitTransaction(wallet, config) {
+    const client = new AptosClient(NODE_URL)
+  
+    let txnRequest = await client.generateTransaction(wallet.address(), config)
+    let bscTxn = AptosClient.generateBCSTransaction(wallet, txnRequest)
+    let transactionRes = await client.submitSignedBCSTransaction(bscTxn);
+  
+    return transactionRes.hash
+  }
+  
+  
+
+module.exports = { getWallet, sendTransaction }

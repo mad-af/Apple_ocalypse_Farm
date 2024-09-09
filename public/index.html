@@ -40,34 +40,13 @@
     <p class="text-center" style="color: white;">Plant Here</p>
 </section>
 
-<div class="register d-flex align-item-center flex-row justify-content-center" id="register">
-    <div class="d-flex align-item-center justify-content-center">
-        <div  class="d-flex justify-content-center align-item-center flex-column">
-            <label for="input">Enter your wallet's PRIVATE KEY to play</label><br>
-            <input class="mt-3 mb-3" type="text" name="" id="privateKeyToPlay" placeholder="PRIVATE KEY">
-            <button onclick="retriveWallet()" style="background-color: brown; color: white; border-color: transparent; border-radius: 0.5rem;">
-                PLAY!
-            </button>
-            <p class="text-center" id="messageToPlay"></p>
-            <p class="text-center">
-                <span id="messageTitle"></span></br>
-                <span id="messageWallet"></span>
-            </p>
-        </div>
-    </div>
-</div>
-
 <div class="information text-end mx-2">
-    <p class="m-2" id="coin" style="color: white;">Coin: 2.87654</p>
-    <button class="btn btn-primary" style="background-color: brown;" onclick="showFormSentTo()"  id="send-btn">Send Coin?</button>
+    <p class="m-2" id="coin" style="color: white;"></p>
+    <button class="btn btn-primary" style="background-color: brown; display: none;" onclick="showFormSentTo()"  id="send-btn">Send NFT?</button>
 
     <div class="" id="formSentTo" style="color: white; display: none;">
-        <label for="">Re-Input your Private Key</label><br>
-        <input type="text" name="" id="sendCoinKey"><br>
         <label for="">Wallet Address</label><br>
         <input type="text" name="" id="sendCoinAddress"><br>
-        <label for="">Amount</label><br>
-        <input type="text" name="" id="sendCoinAmount"><br>
         <button class="btn btn-primary m-2" style="background-color: brown;" onclick="sendCoin()">Send</button>
         <p id="message_send" class="text-end"></p>
     </div>

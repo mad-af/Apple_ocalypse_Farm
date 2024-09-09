@@ -111,31 +111,10 @@ function harvestApple(e) {
     isPlanted = false;
     changeAppleQuantity();
     changeYield(3);
+    document.getElementById("send-btn").style = "background-color: brown; display: inherite;";
     e.target.remove();
     e.target.removeEventListener('click', harvestApple);
     growthStage = 1;
-}
-
-async function retriveWallet(){
-    const privateKeyToPlay = document.getElementById("privateKeyToPlay").value;
-    
-    if(privateKeyToPlay === "")
-        return document.getElementById("messageToPlay").textContent = "Input can't empty";
-    
-    const respond = await fetch(`http://localhost:8001/api/balance?key=${privateKeyToPlay}`)
-    const data = await respond.json();
-    const balance = parseFloat(data.balance);
-    
-    if(balance < 1){
-        const message = "Balance insufficient, require minimum of 1 coin to play"
-        document.getElementById("messageTitle").textContent = "send min 1 coin to this address";
-        document.getElementById("messageToPlay").textContent = message;
-        document.getElementById("messageWallet").textContent = data.address;
-        return
-    }
-
-    document.getElementById("coin").textContent = `Coin: ${data.balance}`
-    document.getElementById("register").remove()
 }
 
 function showFormSentTo(){
@@ -146,45 +125,16 @@ function showFormSentTo(){
     }
     else{
         document.getElementById("formSentTo").style = "color: white; display: none;"
-        document.getElementById("send-btn").textContent = "Send Coin?";
+        document.getElementById("send-btn").textContent = "Send NFT";
         isSendCoint = false;
     }
 }
 
 async function sendCoin(){
-    const privateKey = document.getElementById("sendCoinKey").value;
     const address = document.getElementById("sendCoinAddress").value;
-    const amount = document.getElementById("sendCoinAmount").value;
-
-    if(privateKey === "" || address === "" || amount === "")
-        return document.getElementById("message_send").textContent = "Input cant empty"
-    else
-        document.getElementById("message_send").textContent = ""
-
-    if(parseFloat(amount) <= -1)
-        return document.getElementById("message_send").textContent = "Amount can't 0 or negative"
-
-    const transaction = await fetch("http://localhost:8001/api/send",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            key:privateKey,
-            address,
-            amount
-        })
-    });
-
-    const respond = await transaction.json();
-
-    if(transaction.status !== 200)
-        return document.getElementById("message_send").textContent = respond.message;
 
     document.getElementById("message_send").textContent = "Transaction successfully"
-    document.getElementById("coin").textContent = `Coin: ${respond.remainBalance.balance}`
+    document.getElementById("send-btn").style = "display: none;";
 
-    document.getElementById("sendCoinKey").value = "";
     document.getElementById("sendCoinAddress").value = "";
-    document.getElementById("sendCoinAmount").value = "";
 }
